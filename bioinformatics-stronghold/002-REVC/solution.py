@@ -1,15 +1,14 @@
+from Bio.Seq import Seq
+from Bio.Alphabet import IUPAC
+
 def reverse_complement(sequence: str) -> str:
     """
     Creates the reverse complement of a RNA sequence
     """
 
-    reversed = sequence[::-1]
-    reversed = reversed.replace('A', 't')
-    reversed = reversed.replace('C', 'g')
-    reversed = reversed.replace('G', 'c')
-    reversed = reversed.replace('T', 'a')
+    coding_dna = Seq(sequence, IUPAC.unambiguous_dna)
 
-    return reversed.upper()
+    return str(coding_dna.reverse_complement())
 
 
 assert reverse_complement('AAAACCCGGT') == 'ACCGGGTTTT'
