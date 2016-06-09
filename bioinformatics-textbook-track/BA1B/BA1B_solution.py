@@ -1,7 +1,8 @@
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
+Kmer = namedtuple('Kmer', 'sequence count')
 
-def naive_frequent_kmer(sequence: str, k: int) -> [str]:
+def naive_frequent_kmer(sequence: str, k: int) -> [Kmer]:
     """
     A naive implementation to find the most frequent kmer in a sequence.
     :param sequence: input sequence
@@ -26,22 +27,28 @@ def naive_frequent_kmer(sequence: str, k: int) -> [str]:
     # order the values
     ordered_kmer_count = OrderedDict(sorted(kmer_count.items(), key=lambda x: x[1]))
 
-    # get one of the most common kmers
-    top_kmer, top_kmer_count = ordered_kmer_count.popitem()
-    frequent_kmers.append(top_kmer)
+    try:
+        # get one of the most common kmers
+        top_kmer, top_kmer_count = ordered_kmer_count.popitem()
+        frequent_kmers.append(Kmer(sequence=top_kmer, count=top_kmer_count))
 
-    # walk through the remaining kmers until we run out of kmers of count
-    next_kmer, next_kmer_count = ordered_kmer_count.popitem()
-
-    while next_kmer_count == top_kmer_count:
-        frequent_kmers.append(next_kmer)
-
+        # walk through the remaining kmers until we run out of kmers of count
         next_kmer, next_kmer_count = ordered_kmer_count.popitem()
+
+        while next_kmer_count == top_kmer_count:
+            frequent_kmers.append(Kmer(sequence=next_kmer, count=next_kmer_count))
+
+            next_kmer, next_kmer_count = ordered_kmer_count.popitem()
+    except KeyError:
+        pass
 
     return frequent_kmers
 
 test_case = naive_frequent_kmer("ACGTTGCATGTCGCATGATGCATGAGAGCT", 4)
 
 assert len(test_case) == 2
-assert 'CATG' in test_case
-assert 'GCAT' in test_case
+
+test_kmers = [kmer.sequence for kmer in test_case]
+
+assert 'CATG' in test_kmers
+assert 'GCAT' in test_kmers
